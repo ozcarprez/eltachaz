@@ -35,7 +35,9 @@
 .reel-modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);font-size:13px}
 .reel-close{background:transparent;border:0;color:var(--paper);font-size:16px;cursor:pointer;width:32px;height:32px;border-radius:50%}
 .reel-close:hover{background:#ffffff20}
-.reel-modal-body{padding:16px;overflow-y:auto;display:flex;justify-content:center;min-height:300px}
+.reel-modal-body{padding:16px;overflow-y:auto;display:flex;justify-content:center;align-items:center;min-height:300px}
+.reel-embed-error{text-align:center;font-size:14px;line-height:1.8;color:#b8b8b0;padding:20px}
+.reel-embed-error a{color:var(--lime);text-decoration:underline}
 .reel-modal-foot{display:flex;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--line)}
 .reel-modal-foot button{background:transparent;border:1px solid #ffffff50;color:var(--paper);border-radius:30px;padding:10px 16px;font-size:13px;font-family:inherit;cursor:pointer}
 .reel-modal-foot button:hover{background:var(--lime);border-color:var(--lime);color:var(--ink)}

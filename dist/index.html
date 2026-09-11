@@ -29,6 +29,7 @@ var countLabel=document.getElementById('reelModalCount');
 var fallback=document.getElementById('reelFallback');
 var current=0;
 var igLoading=false;
+var embedRequestId=0;
 
 function ensureIG(cb){
   if(window.instgrm){cb();return;}
@@ -44,13 +45,41 @@ function ensureIG(cb){
   }
 }
 
+function showEmbedError(url){
+  embedBox.innerHTML='<div class="reel-embed-error">No se pudo cargar este reel aquí.<br><a href="'+url+'" target="_blank" rel="noopener noreferrer">Verlo en Instagram ↗</a></div>';
+}
+
 function loadEmbed(i){
   current=(i+REELS.length)%REELS.length;
   var url=REELS[current];
+  var requestId=++embedRequestId;
   countLabel.textContent='Reel '+(current+1)+' de '+REELS.length;
   fallback.href=url;
   embedBox.innerHTML='<blockquote class="instagram-media" data-instgrm-permalink="'+url+'" data-instgrm-version="14" style="margin:0 auto;max-width:400px;width:100%;"></blockquote>';
-  ensureIG(function(){if(window.instgrm){window.instgrm.Embeds.process();}});
+
+  var observer=new MutationObserver(function(){
+    var f=embedBox.querySelector('iframe');
+    if(f&&!f.dataset.sandboxed){
+      f.dataset.sandboxed='1';
+      // Never let a third-party embed navigate our page away.
+      f.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+      observer.disconnect();
+      setTimeout(function(){
+        if(requestId!==embedRequestId)return;
+        if(f.getBoundingClientRect().height<60){showEmbedError(url);}
+      },4000);
+    }
+  });
+  observer.observe(embedBox,{childList:true,subtree:true});
+
+  ensureIG(function(){
+    if(requestId!==embedRequestId)return;
+    if(window.instgrm){window.instgrm.Embeds.process();}
+  });
+  setTimeout(function(){
+    if(requestId!==embedRequestId)return;
+    if(!embedBox.querySelector('iframe')){observer.disconnect();showEmbedError(url);}
+  },6000);
 }
 
 function openModal(i){
@@ -60,6 +89,7 @@ function openModal(i){
 }
 
 function closeModal(){
+  embedRequestId++;
   modal.setAttribute('aria-hidden','true');
   document.body.style.overflow='';
   embedBox.innerHTML='';
